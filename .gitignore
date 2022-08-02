@@ -1,0 +1,5 @@
+config.yaml
+logs/*
+.idea
+.vs
+.vscode
