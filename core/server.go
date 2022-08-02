@@ -12,7 +12,6 @@ type server interface {
 
 func RunServer() {
 	if global.GVA_CONFIG.System.UseRedis {
-		fmt.Println("1")
 		initialize.Redis()
 	}
 
