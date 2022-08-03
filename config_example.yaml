@@ -12,7 +12,7 @@ zap:
   level: 'info'
   prefix: '[Project_Name] '
   format: 'console'
-  director: 'log'
+  director: 'logs'
   encode-level: 'LowercaseColorLevelEncoder'
   stacktrace-key: 'stacktrace'
   max-age: 30 # 默认日志留存默认以天为单位
