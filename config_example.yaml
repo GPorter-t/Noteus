@@ -10,7 +10,7 @@ jwt:
 # zap logger configuration
 zap:
   level: 'info'
-  prefix: '[github.com/flipped-aurora/gin-vue-admin/server]'
+  prefix: '[Project_Name] '
   format: 'console'
   director: 'log'
   encode-level: 'LowercaseColorLevelEncoder'
@@ -23,7 +23,7 @@ zap:
 redis:
   db: 0
   addr: '127.0.0.1:6379'
-  password: '520qp025'
+  password: ''
 
 # email configuration
 email:
