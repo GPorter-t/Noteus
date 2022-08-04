@@ -1,0 +1,8 @@
+version: 3
+services:
+  Noteus:
+    image: noteus:last
+    ports:
+      - "80:8081"
+    volumes:
+      - ./logs:/go/src/Noteus/logs
