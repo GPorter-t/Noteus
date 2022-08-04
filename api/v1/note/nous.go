@@ -21,14 +21,17 @@ func (n *NousApi) GetNousKeyList(c *gin.Context) {
 }
 
 func (n *NousApi) GetNousRandom(c *gin.Context) {
-	keys, err := nousService.GetKeyList()
-	if err != nil {
-		global.GVA_LOG.Error(err.Error())
-		response.FailWithMessage("获取数据失败"+err.Error(), c)
-		return
+	uuid := c.Query("uuid")
+	if uuid == "" {
+		keys, err := nousService.GetKeyList()
+		if err != nil {
+			global.GVA_LOG.Error(err.Error())
+			response.FailWithMessage("获取数据失败"+err.Error(), c)
+			return
+		}
+		index := rand.Intn(len(keys))
+		uuid = keys[index]
 	}
-	index := rand.Intn(len(keys))
-	uuid := keys[index]
 	item, err := nousService.GetItem(uuid)
 	if err != nil {
 		global.GVA_LOG.Error("获取 keys 失败:" + err.Error())
