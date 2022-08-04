@@ -11,6 +11,7 @@ func (r *NousRouter) InitNousRouter(router *gin.RouterGroup) {
 	nousRouter := router.Group("nous")
 	nousApi := v1.ApiGroupApp.NoteApiGroup.NousApi
 	{
-		nousRouter.GET("", nousApi.GetNousKeyList) // 获取所有keys
+		nousRouter.GET("/all", nousApi.GetNousKeyList)   // 获取所有keys
+		nousRouter.GET("/random", nousApi.GetNousRandom) // 随机获取一个常识
 	}
 }
