@@ -34,8 +34,8 @@ func (n *NousApi) GetNousRandom(c *gin.Context) {
 	}
 	item, err := nousService.GetItem(uuid)
 	if err != nil {
-		global.GVA_LOG.Error("获取 keys 失败:" + err.Error())
-		response.FailWithMessage("获取 keys 失败:"+err.Error(), c)
+		global.GVA_LOG.Error("获取 key 失败:" + err.Error())
+		response.FailWithMessage("获取 key 失败:"+err.Error(), c)
 		return
 	}
 	response.OkWithData(item, c)
