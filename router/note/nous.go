@@ -13,5 +13,6 @@ func (r *NousRouter) InitNousRouter(router *gin.RouterGroup) {
 	{
 		nousRouter.GET("/all", nousApi.GetNousKeyList) // 获取所有keys
 		nousRouter.GET("", nousApi.GetNousRandom)      // 随机获取一个常识
+		nousRouter.POST("", nousApi.PostNousItem)      // 提交一个常识数据
 	}
 }
