@@ -4,15 +4,17 @@ WORKDIR /go/src/Noteus
 COPY . .
 
 RUN go env -w GO111MODULE=on \
-    && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     && go env -w GOPROXY=https://goproxy.cn,direct \
     && go env -w CGO_ENABLED=0 \
     && go env \
     && go mod tidy \
-    && go build .
+    && go build -o server .
 
 FROM alpine:latest
 
 WORKDIR /go/src/Noteus
 
-ENTRYPOINT ["./main"]
+COPY --from=builder /go/src/Noteus ./
+COPY --from=builder /go/src/Noteus/config.yaml ./
+
+ENTRYPOINT ./server
