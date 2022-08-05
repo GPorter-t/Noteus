@@ -37,9 +37,9 @@ func (n *NousApi) GetNousRandom(c *gin.Context) {
 		uuid = keys[index]
 	}
 	value, err := nousService.GetItem(uuid)
-	if err != nil {
-		global.GVA_LOG.Error("获取 key 失败:" + err.Error())
-		response.FailWithMessage("获取 key 失败:"+err.Error(), c)
+	if err != nil || value == "'" {
+		global.GVA_LOG.Error("获取 数据 失败:" + err.Error())
+		response.FailWithMessage("获取 数据 失败:"+err.Error(), c)
 		return
 	}
 	rsp := noteRsp.NousRsp{
@@ -74,5 +74,20 @@ func (n *NousApi) PostNousItem(c *gin.Context) {
 		Desc: item.Value,
 	}
 	response.OkWithData(rsp, c)
+	return
+}
+
+func (n *NousApi) DeleteNousItem(c *gin.Context) {
+	uuid := c.Query("uuid")
+	if uuid == "" {
+		response.FailWithMessage("uuid is nil", c)
+		return
+	}
+	err := nousService.DeleteItem(uuid)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	response.OkWithData("success", c)
 	return
 }
