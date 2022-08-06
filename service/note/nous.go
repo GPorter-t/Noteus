@@ -4,6 +4,7 @@ import (
 	"Noteus/global"
 	"Noteus/model/note"
 	"context"
+	"math/rand"
 )
 
 type NousService struct{}
@@ -15,15 +16,30 @@ func (s *NousService) GetAll() (keys []string, err error) {
 	return
 }
 
-func (s *NousService) GetItem(key string) (value string, err error) {
-	if ok, e := global.GVA_REDIS.HExists(ctx, "notes:nous", key).Result(); err != nil {
-		if !ok {
-			value = ""
+func (s *NousService) GetItem(key string) (id string, value string, err error) {
+	if global.GVA_STORE.LRU.Len("notes:nous") == 0 {
+		res, e := s.GetAll()
+		if e != nil {
 			err = e
 			return
 		}
+		for i := 0; i < global.GVA_CONFIG.System.LruMaxSize; i++ {
+			index := rand.Intn(len(res))
+			v, _ := global.GVA_REDIS.HGet(ctx, "notes:nous", res[index]).Result()
+			global.GVA_STORE.LRU.Add("notes:nous", res[index], v)
+		}
+	}
+
+	if key == "" {
+		k, v, ok := global.GVA_STORE.LRU.GetBack("notes:nous")
+		if ok {
+			id = k
+			value = v.(string)
+		}
+		return
 	}
 	value, err = global.GVA_REDIS.HGet(ctx, "notes:nous", key).Result()
+
 	return
 }
 

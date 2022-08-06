@@ -88,6 +88,19 @@ func (c *lruCache) RemoveOldest() {
 	}
 }
 
+func (c *lruCache) GetBack() (key string, value interface{}, ok bool) {
+	if c.cache == nil {
+		return
+	}
+	ele := c.ll.Back()
+	e := ele.Value.(*entry)
+	key = e.key
+	value = e.value
+	ok = true
+	c.removeElement(ele)
+	return
+}
+
 func (c *lruCache) removeElement(ele *list.Element) {
 	c.ll.Remove(ele)
 
@@ -187,4 +200,13 @@ func (s *LRUStore) Len(table string) int {
 		return c.Len()
 	}
 	return 0
+}
+
+func (s *LRUStore) GetBack(table string) (key string, value interface{}, ok bool) {
+	if c, stat := s.Store[table]; stat {
+		if key, value, ok = c.GetBack(); ok {
+			return
+		}
+	}
+	return
 }

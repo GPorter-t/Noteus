@@ -8,7 +8,6 @@ import (
 	noteRsp "Noteus/model/note/response"
 	"github.com/gin-gonic/gin"
 	goUuid "github.com/satori/go.uuid"
-	"math/rand"
 )
 
 type NousApi struct{}
@@ -26,24 +25,14 @@ func (n *NousApi) GetNousKeyList(c *gin.Context) {
 
 func (n *NousApi) GetNousRandom(c *gin.Context) {
 	uuid := c.Query("uuid")
-	if uuid == "" {
-		keys, err := nousService.GetAll()
-		if err != nil {
-			global.GVA_LOG.Error(err.Error())
-			response.FailWithMessage("获取数据失败"+err.Error(), c)
-			return
-		}
-		index := rand.Intn(len(keys))
-		uuid = keys[index]
-	}
-	value, err := nousService.GetItem(uuid)
+	key, value, err := nousService.GetItem(uuid)
 	if err != nil || value == "'" {
 		global.GVA_LOG.Error("获取 数据 失败:" + err.Error())
 		response.FailWithMessage("获取 数据 失败:"+err.Error(), c)
 		return
 	}
 	rsp := noteRsp.NousRsp{
-		Uuid: uuid,
+		Uuid: key,
 		Desc: value,
 	}
 	response.OkWithData(rsp, c)
