@@ -136,7 +136,7 @@ func NewLRUStore(maxSize int) *LRUStore {
 }
 
 func (s *LRUStore) Get(table string, key string) (value interface{}, ok bool) {
-	if c, ok := s.Store[table]; ok {
+	if c, stat := s.Store[table]; stat {
 		value, ok = c.Get(key)
 		return
 	}
@@ -161,6 +161,15 @@ func (s *LRUStore) Remove(table string) {
 
 	if _, ok := s.Store[table]; ok {
 		delete(s.Store, table)
+	}
+}
+
+func (s *LRUStore) RemoveItem(table string, key string) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	if c, ok := s.Store[table]; ok {
+		c.Remove(key)
 	}
 }
 

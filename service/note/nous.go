@@ -16,9 +16,10 @@ func (s *NousService) GetAll() (keys []string, err error) {
 }
 
 func (s *NousService) GetItem(key string) (value string, err error) {
-	if ok, err := global.GVA_REDIS.HExists(ctx, "notes:nous", key).Result(); err != nil {
+	if ok, e := global.GVA_REDIS.HExists(ctx, "notes:nous", key).Result(); err != nil {
 		if !ok {
 			value = ""
+			err = e
 			return
 		}
 	}
