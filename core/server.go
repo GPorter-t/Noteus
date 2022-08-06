@@ -15,6 +15,10 @@ func RunServer() {
 		initialize.Redis()
 	}
 
+	if global.GVA_CONFIG.System.UseLRU {
+		initialize.Storage()
+	}
+
 	Router := initialize.Routers()
 	address := fmt.Sprintf("%s:%d", global.GVA_CONFIG.System.Host, global.GVA_CONFIG.System.Port)
 
