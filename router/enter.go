@@ -1,9 +1,13 @@
 package router
 
-import "Noteus/router/note"
+import (
+	"Noteus/router/note"
+	"Noteus/router/system"
+)
 
 type RouterGroup struct {
-	Nous note.NousRouter
+	Nous   note.NoteGroup
+	System system.SystemGroup
 }
 
 var RouterGroupApp = new(RouterGroup)

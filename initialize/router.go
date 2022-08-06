@@ -9,6 +9,7 @@ func Routers() *gin.Engine {
 	Router := gin.Default()
 
 	nousRouter := router.RouterGroupApp.Nous
+	systemRouter := router.RouterGroupApp.System
 
 	PublicGroup := Router.Group("")
 	{
@@ -18,6 +19,7 @@ func Routers() *gin.Engine {
 		})
 	}
 	nousRouter.InitNousRouter(PublicGroup)
+	systemRouter.InitUserRouter(PublicGroup)
 
 	return Router
 }

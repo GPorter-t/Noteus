@@ -1,5 +1,5 @@
 package note
 
-type RouterGroup struct {
+type NoteGroup struct {
 	NousRouter
 }

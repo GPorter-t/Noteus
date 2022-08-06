@@ -5,6 +5,7 @@ import (
 	"Noteus/model/note"
 	"context"
 	"math/rand"
+	"time"
 )
 
 type NousService struct{}
@@ -25,7 +26,8 @@ func (s *NousService) GetItem(key string) (id string, value string, err error) {
 				return
 			}
 			for i := 0; i < global.GVA_CONFIG.System.LruMaxSize; i++ {
-				index := rand.Intn(len(res))
+				r := rand.New(rand.NewSource(time.Now().Unix()))
+				index := r.Intn(len(res))
 				v, _ := global.GVA_REDIS.HGet(ctx, "notes:nous", res[index]).Result()
 				global.GVA_STORE.LRU.Add("notes:nous", res[index], v)
 			}

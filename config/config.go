@@ -7,4 +7,7 @@ type Server struct {
 
 	// gorm
 	Mysql Mysql `mapstructure:"mysql" json:"mysql" yaml:"mysql"`
+
+	// captcha
+	Captcha Captcha `mapstructure:"captcha" json:"captcha" yaml:"captcha"`
 }
