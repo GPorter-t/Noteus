@@ -6,8 +6,8 @@ import (
 )
 
 type ServiceGroup struct {
-	NoteService   note.NousService
-	SystemService system.UserService
+	NoteServiceGroup   note.ServiceGroup
+	SystemServiceGroup system.ServiceGroup
 }
 
 var ServiceGroupApp = new(ServiceGroup)

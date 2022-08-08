@@ -18,6 +18,11 @@ func Routers() *gin.Engine {
 			c.JSON(200, "ok")
 		})
 	}
+	{
+		systemRouter.InitInitRouter(PublicGroup) // 自动初始化相关
+
+	}
+
 	nousRouter.InitNousRouter(PublicGroup)
 	systemRouter.InitUserRouter(PublicGroup)
 

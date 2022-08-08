@@ -7,5 +7,5 @@ type ApiGroups struct {
 }
 
 var (
-	nousService = service.ServiceGroupApp.NoteService
+	nousService = service.ServiceGroupApp.NoteServiceGroup
 )

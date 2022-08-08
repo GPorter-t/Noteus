@@ -11,7 +11,7 @@ func (r *UserRouter) InitUserRouter(router *gin.RouterGroup) {
 	userRouter := router.Group("user")
 	systemApi := v1.ApiGroupApp.SystemApiGroup.SystemApi
 	{
-		userRouter.GET("", systemApi.GetCaptcha) // 获取验证码
-		userRouter.POST("", systemApi.Login)     // 登录
+		userRouter.GET("/captcha", systemApi.GetCaptcha) // 获取验证码
+		userRouter.POST("/login", systemApi.Login)       // 登录
 	}
 }
