@@ -1,6 +1,7 @@
 package initialize
 
 import (
+	"Noteus/global"
 	"Noteus/router"
 	"github.com/gin-gonic/gin"
 )
@@ -26,5 +27,8 @@ func Routers() *gin.Engine {
 	nousRouter.InitNousRouter(PublicGroup)
 	systemRouter.InitUserRouter(PublicGroup)
 
+	InstallPlugin(Router) // 安装插件
+
+	global.GVA_LOG.Info("router register success")
 	return Router
 }
