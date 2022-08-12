@@ -1,6 +1,8 @@
 package initialize
 
 import (
+	"Noteus/global"
+	"Noteus/plugin/email"
 	"Noteus/utils/plugin"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -19,5 +21,13 @@ func InstallPlugin(Router *gin.Engine) {
 	PrivateGroup := Router.Group("")
 	fmt.Println("鉴权插件安装==>", PrivateGroup)
 	// PrivateGroup.User()
-	// PluginInit(PrivateGroup, Plugin)
+	PluginInit(PrivateGroup, email.CreateEmailPlug(
+		global.GVA_CONFIG.Email.To,
+		global.GVA_CONFIG.Email.From,
+		global.GVA_CONFIG.Email.Host,
+		global.GVA_CONFIG.Email.Secret,
+		global.GVA_CONFIG.Email.Nickname,
+		global.GVA_CONFIG.Email.Port,
+		global.GVA_CONFIG.Email.IsSSL,
+	))
 }
