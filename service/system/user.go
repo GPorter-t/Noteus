@@ -20,8 +20,25 @@ type UserService struct {
 func (s *UserService) GetCaptcha(username string) string {
 	captcha := utils.CreateCaptcha(global.GVA_CONFIG.Captcha.KeyLong)
 	timeout := time.Duration(global.GVA_CONFIG.Captcha.TimeOut)
-	global.GVA_REDIS.Set(ctx, "system:user:captcha::"+username, captcha, time.Second*timeout)
+	_, err := global.GVA_REDIS.Set(ctx, "system:user:captcha::"+username, captcha, time.Second*timeout).Result()
+	if err != nil {
+		fmt.Printf(err.Error())
+	}
 	return captcha
+}
+
+func verifyCaptcha(username string, captcha string) (ok bool, err error) {
+	c, e := global.GVA_REDIS.Get(ctx, "system:user:captcha::"+username).Result()
+	if e != nil {
+		global.GVA_LOG.Error("获取失败:" + e.Error())
+		return false, fmt.Errorf("获取验证码失败: %v\n", e)
+	}
+	if c != captcha {
+		return false, fmt.Errorf("验证码错误")
+	} else {
+		global.GVA_REDIS.Del(ctx, "system:user:captcha::"+username)
+		return true, nil
+	}
 }
 
 // Register @author: [piexlmax](https://github.com/piexlmax)
@@ -29,54 +46,76 @@ func (s *UserService) GetCaptcha(username string) string {
 //@description: 用户注册
 //@param: u model.User
 //@return: userInter system.User, err error
-func (s *UserService) Register(u system.User) (userInter system.User, err error) {
+func (s *UserService) Register(u system.User, captcha string) (userInter *system.User, err error) {
 	var user system.User
-	if !errors.Is(global.GVA_DB.Where("username = ?", u.Username).Or("email = ?", u.Email).Or("wechat_id=?", u.WechatId).First(&user).Error, gorm.ErrRecordNotFound) {
-		return userInter, errors.New("用户已注册")
+	if !errors.Is(global.GVA_DB.Where("email = ?", u.Email).First(&user).Error, gorm.ErrRecordNotFound) {
+		return nil, errors.New("用户已注册")
 	}
-	u.Password = utils.BcryptHash(u.Password)
-	u.UUID = uuid.NewV4()
+	if ok, _ := verifyCaptcha(u.Email, captcha); !ok {
+		return userInter, errors.New("验证码错误")
+	}
+	u.Username = u.Email
+	if u.Password != "" {
+		u.Password = utils.BcryptHash(u.Password)
+	}
+	u.UserId = uuid.NewV4()
 	err = global.GVA_DB.Create(&u).Error
-	return u, err
+	return &u, err
 }
 
-func (s *UserService) Login(u *system.User) (userInter *system.User, sessionId string, err error) {
+type loginMode func(username, password string) (user *system.User, err error)
+
+func (s *UserService) Login(username, password string, mode int) (userInter *system.User, err error) {
 	if nil == global.GVA_DB {
-		return nil, "", fmt.Errorf("db not init")
+		return nil, fmt.Errorf("db not init")
 	}
-
-	var user system.User
-	err = global.GVA_DB.Where("username = ?", u.Username).Or("email = ?", u.Email).Or("wechat_id=?", u.WechatId).Find(&user).Error
-	if err == nil {
-		if u.WechatId == "" {
-			if ok := utils.BcryptCheck(u.Password, user.Password); !ok {
-				return nil, "", fmt.Errorf("密码错误")
-			}
-		} else {
-			i, e := global.GVA_REDIS.Exists(ctx, "system:user:captcha::"+u.WechatId).Result()
-			if e != nil {
-				return nil, "", fmt.Errorf("请先获取验证码")
-			}
-			if i != int64(1) {
-				return nil, "", fmt.Errorf("验证码错误")
-			}
-			global.GVA_REDIS.Del(ctx, "system:user:captcha::"+u.Username)
-		}
+	var login loginMode
+	switch mode {
+	case 0:
+		login = loginWithPassword
+	case 1:
+		login = loginWithCaptcha
 	}
-
-	sessionId = uuid.NewV4().String()
-	return &user, sessionId, nil
+	user, err := login(username, password)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
-func (s *UserService) SelectLoginMode(mode int, username, password string) (user *system.User, err error) {
-	user = new(system.User)
-	if mode == 0 {
-		user.Username = username
-	} else if mode == 1 {
-		user.Email = username
-	} else if mode == 2 {
-		user.WechatId = username
+func loginWithCaptcha(username, captcha string) (user *system.User, err error) {
+	var u *system.User
+	err = global.GVA_DB.Where("email = ?", username).Or("username=?", username).Find(&u).Error
+	if err == nil {
+		ok, e := verifyCaptcha(username, captcha)
+		if ok {
+			return u, nil
+		} else {
+			return nil, e
+		}
+	} else {
+		global.GVA_LOG.Error("数据库查询错误：" + err.Error())
 	}
-	user.Password = password
+	return
+}
+
+func loginWithPassword(username, password string) (user *system.User, err error) {
+	var u *system.User
+	err = global.GVA_DB.Where("email = ?", username).Or("username=?", username).Find(&u).Error
+	if err == nil {
+		if ok := utils.BcryptCheck(password, u.Password); !ok {
+			return nil, fmt.Errorf("密码错误")
+		}
+		return u, nil
+	}
+	global.GVA_LOG.Error("数据库查询错误：" + err.Error())
+	return nil, err
+}
+
+func (s *UserService) GetItem(username string) (user *system.User, err error) {
+	err = global.GVA_DB.Where("email = ?", username).Or("username=?", username).Find(&user).Error
+	if err != nil {
+		global.GVA_LOG.Error("查询数据错误：" + err.Error())
+	}
 	return
 }

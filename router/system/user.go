@@ -13,5 +13,7 @@ func (r *UserRouter) InitUserRouter(router *gin.RouterGroup) {
 	{
 		userRouter.GET("/captcha", systemApi.GetCaptcha) // 获取验证码
 		userRouter.POST("/login", systemApi.Login)       // 登录
+		userRouter.POST("/register", systemApi.Register) // 注册接口
+		userRouter.GET("/", systemApi.GetInfo)           // 获取账号信息
 	}
 }

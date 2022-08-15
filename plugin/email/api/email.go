@@ -11,6 +11,10 @@ import (
 
 type EmailApi struct{}
 
+// EmailTest
+// request: POST https://host:port/email/emailTest
+// request Body:
+// response Body: {"code":0,"data":{},"msg":"发送成功"}
 func (s *EmailApi) EmailTest(c *gin.Context) {
 	if err := service.ServiceGroupApp.EmailTest(); err != nil {
 		global.GVA_LOG.Error("发送失败", zap.Error(err))
@@ -20,6 +24,10 @@ func (s *EmailApi) EmailTest(c *gin.Context) {
 	}
 }
 
+// SendEmail
+// request: POST https://host:port/email/sendEmail
+// request Body: {"to": "374744710@qq.com", "subject":"test", "body": "1234"}
+// response Body: {"code":0,"data":{},"msg":"发送成功"}
 func (s *EmailApi) SendEmail(c *gin.Context) {
 	var email email_response.Email
 	_ = c.ShouldBindJSON(&email)

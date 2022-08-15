@@ -1,0 +1,27 @@
+GET http://localhost:8081/user/captcha?username=374744710@qq.com
+
+################################
+POST http://localhost:8081/user/register
+Content-Type: application/json
+
+{"email": "",  "captcha": "6?R!yO"}
+
+###
+POST http://localhost:8081/init/initdb
+Content-Type: application/json
+
+{"dbType":  "mysql", "host": "127.0.0.1", "port": "3306", "userName":  "root", "password":  "", "dbname":  ""}
+
+###
+GET http://localhost:8081/user/
+Cookie: session_id=5dc3ceab-9f9e-4d8f-bc93-583d80484dcf;
+
+###
+GET http://localhost:8081/user/?username=1179834671@qq.com
+
+
+###
+POST http://localhost:8081/user/login
+Content-Type: application/json
+
+{"username": "374744710@qq.com", "password": "CLi1tm", "mode": 1}
