@@ -5,6 +5,8 @@ import (
 	"Noteus/plugin/email"
 	"Noteus/utils/plugin"
 	"fmt"
+
+	chatroom "github.com/GPorter-t/gin-plugin-chatroom"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,5 +31,11 @@ func InstallPlugin(Router *gin.Engine) {
 		global.GVA_CONFIG.Email.Nickname,
 		global.GVA_CONFIG.Email.Port,
 		global.GVA_CONFIG.Email.IsSSL,
+	))
+
+	PluginInit(PrivateGroup, chatroom.CreateChatRoomPlugin(
+		global.GVA_CONFIG.Redis.Addr,
+		global.GVA_CONFIG.Redis.Password,
+		global.GVA_CONFIG.Redis.DB,
 	))
 }
